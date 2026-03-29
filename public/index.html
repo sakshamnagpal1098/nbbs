@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shop Search</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 220px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    #resultBox {
+      margin-top: 30px;
+      padding: 30px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 180px;
+    }
+
+    .name {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .price {
+      font-size: 42px;
+      font-weight: bold;
+      color: green;
+      margin-bottom: 15px;
+    }
+
+    .desc {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .error {
+      font-size: 20px;
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+
+</head>
+<body>
+
+<h2>Enter Product Code</h2>
+
+<input type="text" id="sku" placeholder="e.g. 101 / d101 / w101">
+<br>
+
+<button onclick="search()">Search</button>
+<button onclick="refreshCache()">🔄 Refresh</button>
+
+<div id="resultBox"></div>
+
+<script>
+function search() {
+  const sku = document.getElementById("sku").value;
+
+  fetch(`/api/item?sku=${sku}`)
+    .then(res => res.text())
+    .then(data => {
+      try {
+        const json = JSON.parse(data);
+
+        document.getElementById("resultBox").innerHTML = `
+          <div class="name">${json.name}</div>
+          <div class="price">₹${json.price}</div>
+          <div class="desc">${json.description}</div>
+        `;
+      } catch {
+        document.getElementById("resultBox").innerHTML = `
+          <div class="error">${data}</div>
+        `;
+      }
+    });
+}
+
+function refreshCache() {
+  fetch(`/api/refresh`, { method: "POST" })
+    .then(res => res.text())
+    .then(msg => alert(msg));
+}
+</script>
+
+</body>
+</html>
